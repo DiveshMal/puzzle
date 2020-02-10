@@ -28,18 +28,34 @@ export class StocksComponent implements OnInit {
   constructor(private fb: FormBuilder, private priceQuery: PriceQueryFacade) {
     this.stockPickerForm = fb.group({
       symbol: [null, Validators.required],
-      period: [null, Validators.required]
+      startDate: [null, Validators.required],
+      endDate: [null, Validators.required]
     });
   }
 
   ngOnInit() {
-    this.stockPickerForm.valueChanges.subscribe(this.fetchQuote);
   }
 
-  fetchQuote() {
-    if (this.stockPickerForm.valid) {
-      const { symbol, period } = this.stockPickerForm.value;
-      this.priceQuery.fetchQuote(symbol, period);
+  dateChange($event, type): void {
+    if (type === 'start') {
+      const endDate = this.stockPickerForm.get('endDate').value;
+      if ($event.value.getTime() > endDate.getTime()) {
+        this.stockPickerForm.controls.fromDate.setValue(endDate);
+      };
+    } else {
+      const startDate = this.stockPickerForm.get('startDate').value;
+      if ($event.value.getTime() < startDate.getTime()) {
+        this.stockPickerForm.controls.endDate.setValue(startDate);
+      };
     }
+    const symbol = this.stockPickerForm.get('symbol').value;
+    if (this.stockPickerForm.valid) {
+      this.priceQuery.fetchQuote(symbol, this.stockPickerForm.get('startDate').value, 
+      this.stockPickerForm.get('endDate').value);
+    }
+    
+
   }
+
+
 }
