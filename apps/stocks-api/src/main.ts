@@ -2,21 +2,22 @@
  * This is not a production server yet!
  * This is only a minimal backend to get started.
  **/
-import { Server } from 'hapi';
-
+const Server = require('hapi');
+const axios = require('axios');
+const apiKey =  'Tpk_ceacd85a06524a0b8d53adb8681b76ae';
+const apiURL= 'https://sandbox.iexapis.com';
 const init = async () => {
   const server = new Server({
-    port: 3333,
+    port: 3000,
     host: 'localhost'
   });
-
+ 
   server.route({
     method: 'GET',
-    path: '/',
-    handler: (request, h) => {
-      return {
-        hello: 'world'
-      };
+    path: '/beta/stock/{symbol}/chart/{period}',
+    handler: async(request, h) => {
+      const stockData = await axios.get(apiURL + '/beta/stock/{symbol}/chart/{period}?token=' + apiKey)
+      return h.response(stockData);
     }
   });
 
